@@ -59,6 +59,12 @@ functioning.
 
 ## Installation
 
+You can install LAIr from CRAN:
+
+``` r
+install.packages('LAIr')
+```
+
 You can install the development version of LAIr using devtools ([Wickham
 et al. 2021](https://CRAN.R-project.org/package=devtools)):
 
@@ -72,9 +78,9 @@ devtools::install_git("https://gitlab.com/fchianucci/LAIr")
 The `LAIr` package features a single `NDVI2LAI` function. The function
 allows to import an input Raster\* or numeric vector and select the
 suitable conversion equation formula(s) based on a set of optional
-vegetation (*category*, *type*, *name*), or sensor (*sensor* name,
-*platform*, *resolution*) filtering parameters. If no arguments are not
-considered, the function by default implement all the available
+vegetation (*biome,* *category*, *type*, *name*), or sensor (*sensor*
+name, *platform*, *resolution*) filtering parameters. If no arguments
+are not considered, the function by default implement all the available
 functions.
 
 The list of all available LAI-NDVI equations have been compiled by
@@ -88,17 +94,17 @@ library(LAIr)
 head(NDVI2LAIeq)
 ```
 
-    #> # A tibble: 6 × 11
-    #>   Function.ID        F.ID  Plant.Category Plant.Type Plant.Name Location.Biome  
-    #>   <chr>              <chr> <chr>          <chr>      <chr>      <chr>           
-    #> 1 Johnson_et_al_2001 F001  Crop           Permanent  Vineyard   Mediterranean F…
-    #> 2 Wilson_Meyer_2007  F002  Crop           Summer     Maize      Temperate Grass…
-    #> 3 Fei_et_al_2012     F003  Crop           Summer     Maize      Temperate Broad…
-    #> 4 Tan_et_al_2020_a   F004  Crop           Winter     Wheat      Temperate Broad…
-    #> 5 Tan_et_al_2020_b   F005  Crop           Winter     Wheat      Temperate Broad…
-    #> 6 Tan_et_al_2020_c   F006  Crop           Winter     Wheat      Temperate Broad…
-    #> # ℹ 5 more variables: Location.Country <chr>, Sensor.Name <chr>,
-    #> #   Sensor.Platform <chr>, Sensor.Resolution <dbl>,
+    #> # A tibble: 6 × 12
+    #>   Function.ID     F.ID  Plant.Category Plant.Type Plant.Name Location.Biome.Code
+    #>   <chr>           <chr> <chr>          <chr>      <chr>                    <dbl>
+    #> 1 Johnson_et_al_… F001  Crop           Permanent  Vineyard                    12
+    #> 2 Wilson_Meyer_2… F002  Crop           Summer     Maize                        8
+    #> 3 Fei_et_al_2012  F003  Crop           Summer     Maize                        4
+    #> 4 Tan_et_al_2020… F004  Crop           Winter     Wheat                        4
+    #> 5 Tan_et_al_2020… F005  Crop           Winter     Wheat                        4
+    #> 6 Tan_et_al_2020… F006  Crop           Winter     Wheat                        4
+    #> # ℹ 6 more variables: Location.Biome <chr>, Location.Country <chr>,
+    #> #   Sensor.Name <chr>, Sensor.Platform <chr>, Sensor.Resolution <dbl>,
     #> #   Sensor.ResolutionClass <chr>
 
 Below we showed two basic examples depending on the input values.

@@ -5,14 +5,15 @@
 \alias{NDVI2LAIeq}
 \title{Dataset of empirical functions to convert NDVI to LAI in crops, forests and mixed vegetation.}
 \format{
-A data frame with 199 rows and 18 columns:
+A data frame with 199 rows and 19 columns:
 \describe{
 \item{Function.ID}{Equation name.}
 \item{F.ID}{Function ID code varying between F001 and F199.}
 \item{Plant.Category}{Plant categories: "Crop" "Forest" "Mixed".}
 \item{Plant.Type}{Plant types: "Permanent" "Summer" "Winter" "Forest" "Perennial" "Mixed".}
 \item{Plant.Name}{Plant names: "Vineyard" "Maize" "Wheat" "Barley" "Forest" "Poplar" "Soybean" "Rice" "Sunflower" "Sugarcane" "Pasture" "Eucalypt" "Mixed".}
-\item{Location.Biome}{Biome of the experimental location: "Mediterranean Forests, Woodlands & Scrub" "Temperate Grasslands, Savannas & Shrublands"
+\item{Location.Biome.Code}{The Biome code of the experimental location, following Olson & Dinerstein (1998) \doi{10.1046/j.1523-1739.1998.012003502.x}}
+\item{Location.Biome}{The Biome name of the experimental location: "Mediterranean Forests, Woodlands & Scrub" "Temperate Grasslands, Savannas & Shrublands"
 "Temperate Broadleaf & Mixed Forests""Deserts & Xeric Shrublands" "Tropical & Subtropical Dry Broadleaf Forests"
 "Montane Grasslands & Shrublands" "Tropical & Subtropical Grasslands, Savannas & Shrublands" "Tropical & Subtropical Moist Broadleaf Forests".}
 \item{Location.Country}{Country.}

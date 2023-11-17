@@ -1,7 +1,7 @@
 #' @name NDVI2LAI
 #' @title Derive LAI from NDVI using a set of conversion functions
 #' @importFrom dplyr filter
-#' @importFrom stringr str_detect
+#' @importFrom stringr str_detect str_pad
 #' @importFrom terra values rast
 #' @importFrom purrr map
 #' @importFrom utils globalVariables
@@ -13,6 +13,7 @@
 #' The function returns a Raster* or a dataframe depending on the input, with the LAI values computed from the available selected conversion equations.
 #' @param input Raster* or numeric vector. For multi-layer Raster images, the computation is performed for each layer.
 #' @param ID Character. Optional parameter to select the function based on its code. For available options, type 'NDVI2LAIeq' (field 'F.ID')
+#' @param biome Numeric. Optional integer representing the Biome, sensu Olson and Dinerstein 1998 \doi{10.1046/j.1523-1739.1998.012003502.x}. For available options, type 'NDVI2LAIeq' (field 'Location.Biome.Code' and 'Location.Biome').
 #' @param category Character. Optional parameter to select the Plant Category among: "Crop" "Forest" "Mixed".
 #' @param type Character. Optional parameter to select the Plant Type. For available options, type 'NDVI2LAIeq' (field 'Plant.Type')
 #' @param name Character. Optional parameter to select the Plant Name. For available options, type 'NDVI2LAIeq' (field 'Plant.Name')
@@ -34,6 +35,7 @@
 #' @seealso Bajocco et al. (2022). On the Use of NDVI to Estimate LAI in Field Crops: Implementing a Conversion Equation Library. Remote Sens. , 3554, doi: \doi{10.3390/rs14153554}\cr
 #' @usage NDVI2LAI(input,
 #'  ID=NULL,
+#'  biome=NULL,
 #'  category=NULL,
 #'  type=NULL,
 #'  name=NULL,
@@ -41,11 +43,17 @@
 #'  platform=NULL,
 #'  resolution=NULL)
 #' @export
+#'
+#'
+utils::globalVariables(c('F.ID', 'Location.Biome.Code', 'NDVI2LAIeq',
+                         'Plant.Category', 'Plant.Name', 'Plant.Type',
+                         'Sensor.Name', 'Sensor.Platform',
+                         'Sensor.ResolutionClass'))
 
-utils::globalVariables(c("F.ID","Sensor.ResolutionClass", "Equation.R2","NDVI2LAIeq", "Plant.Category", "Plant.Name", "Plant.Type", "Sensor.Name", "Sensor.Platform", "str_pad"))
 
 NDVI2LAI<-function(input,
                    ID=NULL,
+                   biome=NULL,
                    category=NULL,
                    type=NULL,
                    name=NULL,
@@ -70,14 +78,25 @@ NDVI2LAI<-function(input,
   #evaluate filtering arguments;
   #filtering on F.ID
   if(is.null(ID)){
-    flt1<-NDVI2LAIeq
+    flt0<-NDVI2LAIeq
   }
   else {
-    if(length(setdiff(F.ID,unique(NDVI2LAIeq$F.ID)))>0){
-      stop(paste0('Wrong input Function ID.\n It varies from ', (paste0('F',str_pad(1,3,pad='0'))), ' to ', paste0('F',str_pad(nrow(NDVI2LAIeq),3,pad='0'))) )
+    if(length(setdiff(ID, unique(NDVI2LAIeq$F.ID)))>0){
+      stop(paste0('Wrong input Function ID.\n It varies from ', (paste0('F',stringr::str_pad(1,3,pad='0'))), ' to ', paste0('F',stringr::str_pad(nrow(NDVI2LAIeq),3,pad='0'))) )
     }
-    flt1<-NDVI2LAIeq |>
+    flt0<-NDVI2LAIeq |>
       dplyr::filter(F.ID  %in%  ID)
+  }
+
+  #filtering on biome:
+  if(is.null(biome)){
+    flt1<-flt0
+  } else {
+    if(length(setdiff(biome, 1:12))>0){
+      stop(paste0('Wrong Biome code.It varies from 1 to 12. Please correct'))
+    }
+    flt1<-flt0 |>
+      dplyr::filter(Location.Biome.Code  %in%  biome)
   }
 
   #second filtering:
@@ -153,6 +172,7 @@ NDVI2LAI<-function(input,
   }
 
 
+
  #Final flt table is sequentially created from the previous arguments:
   flt <- flt7
 
@@ -164,20 +184,28 @@ NDVI2LAI<-function(input,
 
 #Based on the input, it get different output:
   #case Raster*
+  #if they came from raster:: pkg:
   if(stringr::str_detect(class(input),'RasterLayer|RasterBrick|RasterStack')){
     input <- terra::rast(input)
   }
+  #if they came from terra:: pkg:
   if(stringr::str_detect(class(input),'Raster')){
+    # input <- terra::mask(input, is.na(input), maskvalues=TRUE, updatevalue=0)
     fnl.rst=input
     # names(fnl.rst) <- "input"
     for (i in 1: nrow(flt)){
-      if(abs(max(terra::values(input)))>1){
+      #check boundaries
+      if(max(abs(terra::values(input)), na.rm=T)>1){
         warning('values exceed the range of NDVI [-1,1]. These values will be omitted in the calculation.')
       }
-      out.rst <- input
+
+
       # names(fnl.rst) <- "input"
-      out<-purrr::map(terra::values(input),flt$Function.call[i])
+      out.rst <- input
+      out<-purrr::map(terra::values(input), flt$Function.call[i])
       terra::values(out.rst)<-as.numeric(out)
+      #if NDVI=0, it equals LAI=0:
+      out.rst <- terra::mask(out.rst, input==0, maskvalues=TRUE, updatevalue=0)
       names(out.rst)<-paste0(names(out.rst),'_',gsub('NDVItoLAI_','',flt$Function.ID[i]))
       fnl.rst<-terra::rast(list(fnl.rst, out.rst))
     }
@@ -187,11 +215,17 @@ NDVI2LAI<-function(input,
   if(stringr::str_detect(class(input),'numeric')){
     fnl.rst = data.frame(input=input)
     for (i in 1: nrow(flt)){
-      if(abs(max(input))>1){
+      if(max(abs(t(input)), na.rm=T)>1){
         warning('values exceed the range of NDVI [-1,1]. They will be omitted in the calculation.')
       }
+      #if there are NAs, they were set to -999 (they equals a LAI=NA)
+      # input[is.na(input)] <- -999
       out <- purrr::map(input,flt$Function.call[i])
-      outdf <- data.frame(out=as.numeric(out))
+      out <- as.numeric(out)
+      #if ndvi = 0, it equals LAI=0
+      out[input==0] <- 0
+      outdf <- data.frame(out=out)
+
       names(outdf) <- gsub('NDVItoLAI_','',flt$Function.ID[i])
       fnl.rst=cbind(fnl.rst,outdf)
     }

@@ -6,6 +6,7 @@
 \usage{
 NDVI2LAI(input,
  ID=NULL,
+ biome=NULL,
  category=NULL,
  type=NULL,
  name=NULL,
@@ -17,6 +18,8 @@ NDVI2LAI(input,
 \item{input}{Raster* or numeric vector. For multi-layer Raster images, the computation is performed for each layer.}
 
 \item{ID}{Character. Optional parameter to select the function based on its code. For available options, type 'NDVI2LAIeq' (field 'F.ID')}
+
+\item{biome}{Numeric. Optional integer representing the Biome, sensu Olson and Dinerstein 1998 \doi{10.1046/j.1523-1739.1998.012003502.x}. For available options, type 'NDVI2LAIeq' (field 'Location.Biome.Code' and 'Location.Biome').}
 
 \item{category}{Character. Optional parameter to select the Plant Category among: "Crop" "Forest" "Mixed".}
 
