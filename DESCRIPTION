@@ -1,7 +1,7 @@
 Package: LAIr
 Type: Package
 Title: Converting NDVI to LAI of Field, Proximal and Satellite Data
-Version: 0.2.0
+Version: 0.3.0
 Authors@R: c(
   person(given = "Francesco",
         family = "Chianucci",
@@ -47,7 +47,7 @@ RoxygenNote: 7.2.3
 Depends: R (>= 2.10)
 Imports: dplyr, purrr, stringr, terra
 NeedsCompilation: no
-Packaged: 2023-11-17 09:01:43 UTC; francescochianucci
+Packaged: 2024-02-22 15:23:18 UTC; francescochianucci
 Author: Francesco Chianucci [aut, cre]
     (<https://orcid.org/0000-0002-5688-2060>),
   Francesco Savian [aut],
@@ -57,4 +57,4 @@ Author: Francesco Chianucci [aut, cre]
   Simone Bregaglio [aut] (<https://orcid.org/0000-0001-8381-2626>),
   Sofia Bajocco [aut] (<https://orcid.org/0000-0003-2301-9188>)
 Repository: CRAN
-Date/Publication: 2023-11-17 09:32:39 UTC
+Date/Publication: 2024-02-22 15:40:02 UTC

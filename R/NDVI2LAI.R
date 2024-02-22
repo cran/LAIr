@@ -23,9 +23,9 @@
 #'
 #' @return A Raster* or a dataframe depending on the input.
 #' @examples
-#' # generate a raster
-#' set.seed(123)
-#' input <- terra::rast(ncol = 9, nrows = 9, vals = runif(81))
+#' #using a real raster:
+#' file <- system.file('extdata/ndvi-italy.tiff', package='LAIr')
+#' input <- terra::rast(file)
 #' res <- NDVI2LAI(input, category = 'Crop', name = c('Vineyard', 'Barley'), sensor = 'MODIS')
 #' terra::plot(res)
 #'
